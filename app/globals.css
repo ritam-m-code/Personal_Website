@@ -1,0 +1,576 @@
+:root {
+  --bg: #04111d;
+  --bg-deep: #01060d;
+  --panel: rgba(7, 20, 34, 0.76);
+  --panel-strong: rgba(8, 29, 47, 0.92);
+  --line: rgba(110, 224, 255, 0.22);
+  --line-strong: rgba(102, 235, 255, 0.72);
+  --text: #e7fbff;
+  --muted: #8ea8bd;
+  --accent: #5af2ff;
+  --accent-strong: #3db4ff;
+  --accent-soft: rgba(90, 242, 255, 0.16);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top, rgba(46, 129, 255, 0.16), transparent 30%),
+    radial-gradient(circle at bottom right, rgba(90, 242, 255, 0.14), transparent 22%),
+    linear-gradient(180deg, #061321 0%, #02070e 100%);
+  color: var(--text);
+  font-family: "Consolas", "Bahnschrift", "Segoe UI", sans-serif;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: radial-gradient(circle at center, black, transparent 88%);
+  pointer-events: none;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+.app-frame {
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.intro-screen,
+.site-shell {
+  position: relative;
+  min-height: 100vh;
+}
+
+.intro-screen {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  align-items: center;
+  gap: 3rem;
+  padding: 4rem 6vw;
+}
+
+.intro-screen::before,
+.site-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(61, 180, 255, 0.14), transparent 18%),
+    radial-gradient(circle at 80% 30%, rgba(90, 242, 255, 0.12), transparent 22%),
+    linear-gradient(135deg, rgba(90, 242, 255, 0.05), transparent 40%);
+  pointer-events: none;
+}
+
+.intro-copy,
+.hero-copy,
+.panel-card,
+.wide-panel {
+  position: relative;
+  z-index: 1;
+}
+
+.eyebrow {
+  margin: 0 0 0.85rem;
+  color: var(--accent);
+  font-size: 0.82rem;
+  letter-spacing: 0.28rem;
+  text-transform: uppercase;
+  font-family: "Consolas", "Bahnschrift", monospace;
+}
+
+.intro-copy h1,
+.hero-copy h1 {
+  margin: 0;
+  font-size: clamp(3.4rem, 10vw, 7.5rem);
+  line-height: 0.88;
+  letter-spacing: 0.02rem;
+  text-transform: none;
+  text-shadow: 0 0 24px rgba(90, 242, 255, 0.18);
+  font-family: "Baskerville Old Face", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-weight: 600;
+}
+
+.intro-text,
+.hero-copy p {
+  max-width: 36rem;
+  color: var(--muted);
+  font-size: 1.02rem;
+  line-height: 1.7;
+}
+
+.lab-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 70vh;
+}
+
+.lab-stage::before {
+  content: "";
+  position: absolute;
+  width: min(52vw, 34rem);
+  height: min(52vw, 34rem);
+  border-radius: 50%;
+  border: 1px solid rgba(90, 242, 255, 0.16);
+  box-shadow:
+    0 0 70px rgba(61, 180, 255, 0.12),
+    inset 0 0 45px rgba(90, 242, 255, 0.08);
+  opacity: 0.35;
+}
+
+.lab-scene {
+  position: relative;
+  width: min(38rem, 82vw);
+  aspect-ratio: 1.04;
+}
+
+.lab-back-wall {
+  position: absolute;
+  inset: 1rem 0 5.5rem;
+  border: 1px solid rgba(90, 242, 255, 0.12);
+  border-radius: 1.8rem 1.8rem 0.9rem 0.9rem;
+  background:
+    linear-gradient(rgba(90, 242, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(90, 242, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(8, 20, 34, 0.95), rgba(2, 8, 15, 0.98));
+  background-size: 42px 42px, 42px 42px, auto;
+  box-shadow:
+    inset 0 0 30px rgba(0, 0, 0, 0.35),
+    0 0 32px rgba(61, 180, 255, 0.1);
+}
+
+.lab-light {
+  position: absolute;
+  top: 2.7rem;
+  width: 8rem;
+  height: 0.8rem;
+  border-radius: 999px;
+  background: rgba(167, 197, 218, 0.12);
+  box-shadow: 0 0 0 1px rgba(90, 242, 255, 0.08);
+}
+
+.light-left {
+  left: 4rem;
+}
+
+.light-right {
+  right: 4rem;
+}
+
+.monitor-left,
+.monitor-right {
+  position: absolute;
+  top: 8rem;
+  width: 8.5rem;
+  height: 6.2rem;
+  border: 1px solid rgba(90, 242, 255, 0.12);
+  border-radius: 1rem;
+  background: linear-gradient(180deg, rgba(8, 16, 27, 0.95), rgba(2, 8, 15, 0.98));
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.35);
+}
+
+.monitor-left {
+  left: 3.2rem;
+}
+
+.monitor-right {
+  right: 3.2rem;
+}
+
+.lab-monitor span {
+  position: absolute;
+  inset: 0.85rem;
+  border-radius: 0.55rem;
+  border: 1px solid rgba(90, 242, 255, 0.08);
+  background:
+    linear-gradient(rgba(90, 242, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(90, 242, 255, 0.05) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+.lab-desk {
+  position: absolute;
+  inset: auto 2rem 2.1rem;
+  height: 11rem;
+}
+
+.desk-surface {
+  position: absolute;
+  inset: auto 0 1rem;
+  height: 3rem;
+  border-top: 1px solid rgba(90, 242, 255, 0.14);
+  border-bottom: 1px solid rgba(90, 242, 255, 0.08);
+  background: linear-gradient(180deg, rgba(6, 16, 27, 0.95), rgba(2, 6, 12, 0.98));
+}
+
+.power-console {
+  position: absolute;
+  left: 50%;
+  bottom: 1.3rem;
+  width: 16rem;
+  height: 6rem;
+  border: 1px solid rgba(90, 242, 255, 0.14);
+  border-radius: 1.2rem;
+  background: linear-gradient(180deg, rgba(8, 18, 31, 0.98), rgba(3, 9, 16, 0.98));
+  transform: translateX(-50%);
+  box-shadow:
+    0 18px 44px rgba(0, 0, 0, 0.3),
+    inset 0 0 18px rgba(90, 242, 255, 0.06);
+}
+
+.console-screen {
+  position: absolute;
+  left: 1rem;
+  top: 1.1rem;
+  width: 4rem;
+  height: 2.2rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(90, 242, 255, 0.1);
+  background: rgba(155, 176, 193, 0.08);
+}
+
+.lab-floor-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 1rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(90, 242, 255, 0.18), transparent);
+}
+
+.status-pod {
+  position: absolute;
+  bottom: 4rem;
+  width: 3rem;
+  height: 6rem;
+  border: 1px solid rgba(90, 242, 255, 0.12);
+  border-radius: 1rem;
+  background: linear-gradient(180deg, rgba(7, 18, 29, 0.96), rgba(2, 7, 12, 0.98));
+}
+
+.pod-left {
+  left: 1.2rem;
+}
+
+.pod-right {
+  right: 1.2rem;
+}
+
+.cable {
+  position: absolute;
+  bottom: 4.8rem;
+  width: 7rem;
+  height: 3rem;
+  border-bottom: 1px solid rgba(90, 242, 255, 0.1);
+  border-left: 1px solid rgba(90, 242, 255, 0.1);
+  border-radius: 0 0 0 1rem;
+}
+
+.cable-left {
+  left: 3.8rem;
+}
+
+.cable-right {
+  right: 3.8rem;
+  transform: scaleX(-1);
+}
+
+.lab-label {
+  position: absolute;
+  left: 50%;
+  bottom: -0.7rem;
+  transform: translateX(-50%);
+  color: rgba(90, 242, 255, 0.65);
+  letter-spacing: 0.28rem;
+  font-size: 0.92rem;
+  font-family: "Consolas", "Bahnschrift", monospace;
+}
+
+.power-button {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  z-index: 2;
+  width: 3.9rem;
+  height: 3.9rem;
+  border: 1px solid rgba(90, 242, 255, 0.42);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at center, rgba(90, 242, 255, 0.28), rgba(7, 20, 34, 0.96) 55%),
+    linear-gradient(180deg, rgba(22, 48, 72, 0.96), rgba(2, 8, 15, 0.96));
+  box-shadow:
+    0 0 35px rgba(90, 242, 255, 0.2),
+    inset 0 0 24px rgba(90, 242, 255, 0.24);
+  transform: translateY(-50%);
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+  isolation: isolate;
+}
+
+.power-button:hover {
+  transform: translateY(-50%) scale(1.04);
+  border-color: rgba(90, 242, 255, 0.82);
+  box-shadow:
+    0 0 48px rgba(90, 242, 255, 0.34),
+    inset 0 0 24px rgba(90, 242, 255, 0.28);
+}
+
+.power-button:active {
+  transform: translateY(-50%) scale(0.98);
+}
+
+.power-ring {
+  position: absolute;
+  inset: 0.9rem;
+  border: 3px solid var(--accent);
+  border-top-color: transparent;
+  border-radius: 50%;
+  box-shadow: 0 0 18px rgba(90, 242, 255, 0.6);
+}
+
+.powered-on .intro-screen {
+  animation: fadeOut 900ms ease forwards;
+}
+
+.powered-on .lab-light {
+  background: linear-gradient(90deg, rgba(90, 242, 255, 0.75), rgba(216, 250, 255, 0.92));
+  box-shadow:
+    0 0 18px rgba(90, 242, 255, 0.45),
+    0 0 48px rgba(90, 242, 255, 0.3);
+}
+
+.powered-on .lab-monitor span,
+.powered-on .console-screen,
+.powered-on .status-pod {
+  background-color: rgba(90, 242, 255, 0.12);
+  box-shadow:
+    inset 0 0 20px rgba(90, 242, 255, 0.12),
+    0 0 24px rgba(90, 242, 255, 0.1);
+}
+
+.powered-on .lab-back-wall {
+  box-shadow:
+    inset 0 0 50px rgba(90, 242, 255, 0.08),
+    0 0 38px rgba(61, 180, 255, 0.14);
+}
+
+.site-shell {
+  padding: 2rem;
+}
+
+.hero-panel,
+.panel-card,
+.wide-panel {
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(180deg, rgba(7, 20, 34, 0.92), rgba(4, 10, 18, 0.9)),
+    linear-gradient(135deg, rgba(90, 242, 255, 0.06), transparent 38%);
+  box-shadow:
+    0 0 0 1px rgba(90, 242, 255, 0.06),
+    inset 0 0 36px rgba(61, 180, 255, 0.06);
+  backdrop-filter: blur(14px);
+}
+
+.hero-panel {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 2rem;
+  align-items: center;
+  min-height: 78vh;
+  padding: 3rem;
+  border-radius: 2rem;
+  overflow: hidden;
+}
+
+.mesh-layer {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgba(90, 242, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(90, 242, 255, 0.08) 1px, transparent 1px);
+  background-size: 54px 54px;
+  opacity: 0.28;
+  mask-image: radial-gradient(circle at center, black 25%, transparent 75%);
+}
+
+.hero-orbital {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 22rem;
+}
+
+.orbital-ring {
+  position: absolute;
+  border: 1px solid rgba(90, 242, 255, 0.25);
+  border-radius: 50%;
+}
+
+.orbital-ring-a {
+  width: min(24rem, 60vw);
+  height: min(24rem, 60vw);
+  animation: spin 18s linear infinite;
+}
+
+.orbital-ring-b {
+  width: min(18rem, 46vw);
+  height: min(18rem, 46vw);
+  border-style: dashed;
+  animation: spinReverse 15s linear infinite;
+}
+
+.signal-core {
+  display: grid;
+  place-items: center;
+  width: 7rem;
+  height: 7rem;
+  border-radius: 1.4rem;
+  background: linear-gradient(135deg, rgba(90, 242, 255, 0.18), rgba(61, 180, 255, 0.4));
+  box-shadow:
+    0 0 44px rgba(61, 180, 255, 0.24),
+    inset 0 0 20px rgba(255, 255, 255, 0.1);
+  transform: rotate(45deg);
+}
+
+.signal-core span {
+  width: 2.8rem;
+  height: 2.8rem;
+  border-radius: 50%;
+  border: 1px solid rgba(231, 251, 255, 0.65);
+  box-shadow: 0 0 24px rgba(90, 242, 255, 0.45);
+}
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+  margin-top: 1.25rem;
+}
+
+.panel-card,
+.wide-panel {
+  padding: 1.4rem;
+  border-radius: 1.35rem;
+}
+
+.panel-card h3,
+.wide-panel h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  letter-spacing: 0.03rem;
+  font-family: "Baskerville Old Face", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-weight: 600;
+}
+
+.placeholder-lines {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 1.2rem;
+}
+
+.placeholder-lines span,
+.terminal-card span {
+  display: block;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(90, 242, 255, 0.12);
+  border-radius: 0.9rem;
+  background: rgba(90, 242, 255, 0.04);
+  color: var(--muted);
+  font-family: "Consolas", "Bahnschrift", monospace;
+}
+
+.wide-panel {
+  margin-top: 1.25rem;
+}
+
+.wide-panel-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 0.7fr;
+  gap: 1.2rem;
+  align-items: start;
+}
+
+.terminal-card {
+  display: grid;
+  gap: 0.75rem;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spinReverse {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.03);
+  }
+}
+
+@media (max-width: 960px) {
+  .intro-screen,
+  .hero-panel,
+  .wide-panel-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .intro-screen {
+    padding: 2rem 1.25rem 3rem;
+  }
+
+  .lab-stage {
+    min-height: 50vh;
+  }
+
+  .site-shell {
+    padding: 1rem;
+  }
+
+  .hero-panel {
+    min-height: auto;
+    padding: 1.5rem;
+  }
+
+  .section-grid {
+    grid-template-columns: 1fr;
+  }
+}
