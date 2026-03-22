@@ -324,6 +324,34 @@ textarea {
   color: rgba(255, 255, 255, 0.75);
 }
 
+.status-academic {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.42rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.73rem;
+  line-height: 1.25;
+}
+
+.status-uw-logo {
+  width: 0.92rem;
+  height: 1.1rem;
+  object-fit: contain;
+  border-radius: 0.15rem;
+  flex-shrink: 0;
+}
+
+.status-academic a {
+  color: rgba(240, 181, 43, 0.95);
+  text-decoration: none;
+}
+
+.status-academic a:hover {
+  text-decoration: underline;
+}
+
 .status-note svg {
   width: 0.88rem;
   height: 0.88rem;
@@ -451,8 +479,9 @@ textarea {
 
 .stack-heading h2 {
   margin: 0;
-  font-size: clamp(1.6rem, 3vw, 2.2rem);
-  letter-spacing: 0.08rem;
+  font-size: clamp(1.9rem, 3.8vw, 2.7rem);
+  letter-spacing: 0.02rem;
+  font-family: "Baskerville Old Face", "Palatino Linotype", Georgia, serif;
 }
 
 .stack-marquee {
@@ -462,10 +491,19 @@ textarea {
   mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
 }
 
+.stack-belts {
+  display: grid;
+  gap: 0.9rem;
+}
+
 .marquee-track {
   display: flex;
   width: max-content;
   animation: techMarquee 38s linear infinite;
+}
+
+.marquee-track.reverse {
+  animation-name: techMarqueeReverse;
 }
 
 .marquee-group {
@@ -496,6 +534,19 @@ textarea {
   letter-spacing: 0.02rem;
 }
 
+.tech-icon img {
+  width: 1.25rem;
+  height: 1.25rem;
+  display: block;
+}
+
+.tech-icon-text {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
 .tech-name {
   font-size: 0.75rem;
   letter-spacing: 0.12rem;
@@ -510,6 +561,15 @@ textarea {
   }
   to {
     transform: translateX(-50%);
+  }
+}
+
+@keyframes techMarqueeReverse {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
   }
 }
 

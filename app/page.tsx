@@ -8,6 +8,12 @@ type PanelCardProps = {
   lines: string[];
 };
 
+type TechItem = {
+  name: string;
+  logo?: string;
+  iconText?: string;
+};
+
 function PanelCard({ eyebrow, title, lines }: PanelCardProps) {
   return (
     <article className="panel-card">
@@ -29,6 +35,7 @@ function PanelCard({ eyebrow, title, lines }: PanelCardProps) {
 function MainSite() {
   const defaultSpotifyHeading = "Last listened to";
   const defaultDiscordHeading = "Last played";
+  const lastDiscordGameStorageKey = "lastDiscordGame";
   const [spotifyStatus, setSpotifyStatus] = useState("Connect Spotify to show your last listened track.");
   const [spotifyHeading, setSpotifyHeading] = useState(defaultSpotifyHeading);
   const [discordStatus, setDiscordStatus] = useState("Connect Discord presence to show your last played game.");
@@ -60,6 +67,24 @@ function MainSite() {
 
     return "just now";
   };
+
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem(lastDiscordGameStorageKey);
+      if (!saved) {
+        return;
+      }
+
+      const parsed = JSON.parse(saved) as { name?: string; seenAt?: string };
+      if (parsed.name && parsed.seenAt) {
+        lastGameRef.current = { name: parsed.name, seenAt: parsed.seenAt };
+        setDiscordHeading(defaultDiscordHeading);
+        setDiscordStatus(`${parsed.name} | ${formatTimeAgo(parsed.seenAt)}`);
+      }
+    } catch {
+      // Ignore corrupted local storage values and continue with API fallback.
+    }
+  }, []);
 
   useEffect(() => {
     let isActive = true;
@@ -116,7 +141,9 @@ function MainSite() {
           if (discordData.game) {
             setDiscordHeading("Currently playing");
             setDiscordStatus(discordData.game);
-            lastGameRef.current = { name: discordData.game, seenAt: new Date().toISOString() };
+            const latestGame = { name: discordData.game, seenAt: new Date().toISOString() };
+            lastGameRef.current = latestGame;
+            window.localStorage.setItem(lastDiscordGameStorageKey, JSON.stringify(latestGame));
           } else if (discordData.fallback) {
             if (discordData.fallback === "No recent game activity found." && lastGameRef.current) {
               const { name, seenAt } = lastGameRef.current;
@@ -149,11 +176,11 @@ function MainSite() {
   }, []);
 
   useEffect(() => {
-    const formatter = new Intl.DateTimeFormat("en-CA", {
-      hour: "2-digit",
+    const formatter = new Intl.DateTimeFormat("en-US", {
+      hour: "numeric",
       minute: "2-digit",
       second: "2-digit",
-      hour12: false,
+      hour12: true,
       timeZone: "America/Toronto",
     });
 
@@ -202,15 +229,167 @@ function MainSite() {
     loadLastPushed();
   }, []);
 
-  const techStack = [
-    { icon: "R", name: "React" },
-    { icon: "N", name: "Node.js" },
-    { icon: "</>", name: "HTML" },
-    { icon: "#", name: "CSS" },
-    { icon: "JS", name: "JavaScript" },
-    { icon: "G", name: "Git" },
-    { icon: "TS", name: "TypeScript" },
-    { icon: "NX", name: "Next.js" },
+  const softwareStack: TechItem[] = [
+    // Programming languages
+    {
+      name: "JavaScript",
+      logo: "https://cdn.simpleicons.org/javascript/F7DF1E",
+    },
+    {
+      name: "TypeScript",
+      logo: "https://cdn.simpleicons.org/typescript/3178C6",
+    },
+    {
+      name: "Python",
+      logo: "https://cdn.simpleicons.org/python/3776AB",
+    },
+    {
+      name: "C++",
+      logo: "https://cdn.simpleicons.org/cplusplus/00599C",
+    },
+    {
+      name: "C#",
+      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/csharp/csharp-original.svg",
+    },
+    {
+      name: "Golang",
+      logo: "https://cdn.simpleicons.org/go/00ADD8",
+    },
+    {
+      name: "HTML",
+      logo: "https://cdn.simpleicons.org/html5/E34F26",
+    },
+    {
+      name: "CSS",
+      logo: "https://cdn.simpleicons.org/css/1572B6",
+    },
+    {
+      name: "SQL",
+      logo: "https://cdn.simpleicons.org/postgresql/4169E1",
+    },
+    {
+      name: "PowerShell",
+      logo: "https://cdn.simpleicons.org/powers/5391FE",
+    },
+    {
+      name: "Processing",
+      logo: "https://cdn.simpleicons.org/processingfoundation/006699",
+    },
+
+    // Libraries and frameworks
+    {
+      name: "React",
+      logo: "https://cdn.simpleicons.org/react/61DAFB",
+    },
+    {
+      name: "Next.js",
+      logo: "https://cdn.simpleicons.org/nextdotjs/FFFFFF",
+    },
+    {
+      name: "Node.js",
+      logo: "https://cdn.simpleicons.org/nodedotjs/5FA04E",
+    },
+    {
+      name: "PyTorch",
+      logo: "https://cdn.simpleicons.org/pytorch/EE4C2C",
+    },
+    {
+      name: "OpenCV",
+      logo: "https://cdn.simpleicons.org/opencv/5C3EE8",
+    },
+    {
+      name: "NumPy",
+      logo: "https://cdn.simpleicons.org/numpy/013243",
+    },
+    {
+      name: "Unity",
+      logo: "https://cdn.simpleicons.org/unity/FFFFFF",
+    },
+    {
+      name: "Supabase",
+      logo: "https://cdn.simpleicons.org/supabase/3FCF8E",
+    },
+
+    // Other technologies
+    {
+      name: "Git",
+      logo: "https://cdn.simpleicons.org/git/F05032",
+    },
+    {
+      name: "Docker",
+      logo: "https://cdn.simpleicons.org/docker/2496ED",
+    },
+    {
+      name: "Linux",
+      logo: "https://cdn.simpleicons.org/linux/FCC624",
+    },
+    {
+      name: "Blender",
+      logo: "https://cdn.simpleicons.org/blender/F5792A",
+    },
+    {
+      name: "n8n",
+      logo: "https://cdn.simpleicons.org/n8n/EA4B71",
+    },
+    {
+      name: "ngrok",
+      logo: "https://cdn.simpleicons.org/ngrok/1F1E37",
+    },
+    {
+      name: "VS Code",
+      logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg",
+    },
+  ];
+
+  const hardwareStack: TechItem[] = [
+    {
+      name: "SolidWorks",
+      iconText: "SW",
+    },
+    {
+      name: "AutoCAD",
+      logo: "https://cdn.simpleicons.org/autodesk/0696D7",
+    },
+    {
+      name: "3D Printing",
+      iconText: "3D",
+    },
+    {
+      name: "Circuits",
+      iconText: "CKT",
+    },
+    {
+      name: "Microcontrollers",
+      iconText: "MCU",
+    },
+    {
+      name: "Sensors",
+      iconText: "SNS",
+    },
+    {
+      name: "Soldering",
+      iconText: "SDR",
+    },
+    {
+      name: "GD&T",
+      iconText: "GD&T",
+    },
+    {
+      name: "PCB Design",
+      iconText: "PCB",
+    },
+    {
+      name: "Raspberry Pi",
+      logo: "https://cdn.simpleicons.org/raspberrypi/A22846",
+    },
+    {
+      name: "Arduino",
+      logo: "https://cdn.simpleicons.org/arduino/00979D",
+    },
+    {
+      name: "ROS 2",
+      logo: "https://cdn.simpleicons.org/ros/22314E",
+    },
   ];
 
   const sections = [
@@ -258,6 +437,15 @@ function MainSite() {
 
             <article className="hero-mini-card hero-compact-card">
               <h2>Status</h2>
+              <p className="status-academic">
+                <img className="status-uw-logo" src="/uw_logo.png" alt="University of Waterloo logo" />
+                <span>
+                  1B Mechatronics{" "}
+                  <a href="https://uwaterloo.ca" target="_blank" rel="noreferrer">
+                    @uwaterloo
+                  </a>
+                </span>
+              </p>
               <p className="status-note">
                 <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
                   <circle
@@ -467,27 +655,57 @@ function MainSite() {
 
       <section className="stack-panel minimal" id="stack">
         <div className="stack-heading">
-          <p className="eyebrow subtle">Systems log</p>
-          <h2>Tech stack</h2>
+          <h2>I&apos;ve built with...</h2>
         </div>
-        <div className="stack-marquee" aria-label="Technology stack marquee">
-          <div className="marquee-track">
-            {[0, 1].map((cloneIndex) => (
-              <div
-                className="marquee-group"
-                key={`group-${cloneIndex}`}
-                aria-hidden={cloneIndex === 1}
-              >
-                {techStack.map((tech) => (
-                  <div className="tech-item" key={`${cloneIndex}-${tech.name}`}>
-                    <span className="tech-icon" aria-hidden="true">
-                      {tech.icon}
-                    </span>
-                    <span className="tech-name">{tech.name}</span>
-                  </div>
-                ))}
-              </div>
-            ))}
+        <div className="stack-belts">
+          <div className="stack-marquee" aria-label="Software technology marquee">
+            <div className="marquee-track">
+              {[0, 1].map((cloneIndex) => (
+                <div
+                  className="marquee-group"
+                  key={`software-group-${cloneIndex}`}
+                  aria-hidden={cloneIndex === 1}
+                >
+                  {softwareStack.map((tech) => (
+                    <div className="tech-item" key={`software-${cloneIndex}-${tech.name}`}>
+                      <span className="tech-icon" aria-hidden="true">
+                        {tech.logo ? (
+                          <img src={tech.logo} alt={`${tech.name} logo`} loading="lazy" />
+                        ) : (
+                          <span className="tech-icon-text">{tech.iconText}</span>
+                        )}
+                      </span>
+                      <span className="tech-name">{tech.name}</span>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="stack-marquee" aria-label="Hardware technology marquee">
+            <div className="marquee-track reverse">
+              {[0, 1].map((cloneIndex) => (
+                <div
+                  className="marquee-group"
+                  key={`hardware-group-${cloneIndex}`}
+                  aria-hidden={cloneIndex === 1}
+                >
+                  {hardwareStack.map((tech) => (
+                    <div className="tech-item" key={`hardware-${cloneIndex}-${tech.name}`}>
+                      <span className="tech-icon" aria-hidden="true">
+                        {tech.logo ? (
+                          <img src={tech.logo} alt={`${tech.name} logo`} loading="lazy" />
+                        ) : (
+                          <span className="tech-icon-text">{tech.iconText}</span>
+                        )}
+                      </span>
+                      <span className="tech-name">{tech.name}</span>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -609,10 +827,6 @@ export default function Home() {
           </button>
         </div>
       )}
-
-      <div className={`scroll-hint ${hasEntered ? "visible" : ""}`}>
-        <span>scroll to explore</span>
-      </div>
     </div>
   );
 }
