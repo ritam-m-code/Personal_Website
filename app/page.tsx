@@ -1,6 +1,6 @@
 "use client";
 
-import { CSSProperties, useEffect, useRef, useState } from "react";
+import { CSSProperties, useEffect, useMemo, useRef, useState } from "react";
 
 type PanelCardProps = {
   eyebrow: string;
@@ -27,6 +27,17 @@ function PanelCard({ eyebrow, title, lines }: PanelCardProps) {
 }
 
 function MainSite() {
+  const techStack = [
+    { icon: "⚛", name: "React" },
+    { icon: "⬢", name: "Node.js" },
+    { icon: "</>", name: "HTML" },
+    { icon: "#", name: "CSS" },
+    { icon: "JS", name: "JavaScript" },
+    { icon: "⎇", name: "Git" },
+    { icon: "TS", name: "TypeScript" },
+    { icon: "▲", name: "Next.js" },
+  ];
+
   const sections = [
     {
       eyebrow: "Research",
@@ -78,6 +89,33 @@ function MainSite() {
         </div>
       </header>
 
+      <section className="stack-panel minimal" id="stack">
+        <div className="stack-heading">
+          <p className="eyebrow subtle">Systems log</p>
+          <h2>Tech stack</h2>
+        </div>
+        <div className="stack-marquee" aria-label="Technology stack marquee">
+          <div className="marquee-track">
+            {[0, 1].map((cloneIndex) => (
+              <div
+                className="marquee-group"
+                key={`group-${cloneIndex}`}
+                aria-hidden={cloneIndex === 1}
+              >
+                {techStack.map((tech) => (
+                  <div className="tech-item" key={`${cloneIndex}-${tech.name}`}>
+                    <span className="tech-icon" aria-hidden="true">
+                      {tech.icon}
+                    </span>
+                    <span className="tech-name">{tech.name}</span>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="section-grid minimal" id="highlights">
         {sections.map((section) => (
           <PanelCard key={section.title} {...section} />
@@ -101,6 +139,28 @@ export default function Home() {
   const [isFading, setIsFading] = useState(false);
   const fadeTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isHovering, setIsHovering] = useState(false);
+  const stars = useMemo(() => {
+    const count = 70;
+    return Array.from({ length: count }, (_, index) => {
+      const left = (index * 11.3) % 100;
+      const top = (index * 7.9 + 23) % 100;
+      const size = 1 + (index % 3) * 0.6;
+      const duration = 3 + (index % 5) * 0.8;
+      const delay = (index * 0.37) % 5;
+      const color = "var(--uw-gold)";
+      const pulseRange = 0.15 + (index % 4) * 0.07;
+      return {
+        id: index,
+        left,
+        top,
+        size,
+        duration,
+        delay,
+        color,
+        pulseRange,
+      };
+    });
+  }, []);
 
   const startReveal = () => {
     if (hasEntered || isFading) {
@@ -131,18 +191,26 @@ export default function Home() {
       {!hasEntered && (
         <div className={`entry-overlay${isFading ? " fading" : ""}`} role="presentation">
           <div className="entry-backdrop" />
-          <svg
-            className="line-art"
-            viewBox="0 0 640 320"
-            preserveAspectRatio="none"
-            aria-hidden="true"
-          >
-            <path d="M0 260 L640 60" />
-            <path d="M0 220 L640 20" />
-            <path d="M40 0 L520 320" />
-            <path d="M100 0 L600 280" />
-            <path d="M240 0 L640 200" />
-          </svg>
+          <div className="starfield" aria-hidden="true">
+            {stars.map((star) => (
+              <span
+                key={star.id}
+                className="twinkle-star"
+                style={
+                  {
+                    top: `${star.top}%`,
+                    left: `${star.left}%`,
+                    width: `${star.size}px`,
+                    height: `${star.size}px`,
+                    animationDuration: `${star.duration}s`,
+                    animationDelay: `${star.delay}s`,
+                    backgroundColor: star.color,
+                    "--pulse-range": `${star.pulseRange}`,
+                  } as CSSProperties
+                }
+              />
+            ))}
+          </div>
           <button
             type="button"
             className="name-trigger"
