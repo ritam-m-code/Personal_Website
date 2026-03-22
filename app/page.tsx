@@ -392,6 +392,60 @@ function MainSite() {
     },
   ];
 
+  const experienceCards = [
+    {
+      company: "Aether Robotics",
+      role: "Controls Intern",
+      dates: "May 2026 - Aug 2026",
+      description:
+        "Built calibration tooling for multi-axis test rigs and improved repeatability in motion validation workflows.",
+    },
+    {
+      company: "Nova Manufacturing Lab",
+      role: "Research Assistant",
+      dates: "Jan 2026 - Apr 2026",
+      description:
+        "Developed data pipelines for CNC sensor streams and supported model evaluation for tool-life prediction.",
+    },
+    {
+      company: "Arc Systems",
+      role: "Embedded Developer",
+      dates: "Sep 2025 - Dec 2025",
+      description:
+        "Implemented microcontroller diagnostics and lightweight telemetry dashboards for hardware bring-up sessions.",
+    },
+  ];
+
+  const projectCards = [
+    {
+      name: "Adaptive Door Monitor",
+      dates: "2025",
+      description:
+        "Edge vision pipeline for motion-triggered capture, alerting, and remote streaming on Raspberry Pi.",
+      tags: ["OpenCV", "Docker", "FastAPI"],
+      githubUrl: "https://github.com/ryanli222/smartdoorbell",
+      demoUrl: "#",
+    },
+    {
+      name: "RUL Transformer Predictor",
+      dates: "2025",
+      description:
+        "Time-series model for CNC tool wear forecasting with reproducible training and visualization tooling.",
+      tags: ["PyTorch", "NumPy", "Python"],
+      githubUrl: "https://github.com/ritam-m-code/RUL-Transfomer",
+      demoUrl: "#",
+    },
+    {
+      name: "Recursive Maze Solver",
+      dates: "2024",
+      description:
+        "Interactive visualizer with recursive generation plus DFS, BFS, and Dijkstra pathfinding comparisons.",
+      tags: ["Processing", "Algorithms", "Visualization"],
+      githubUrl: "https://github.com/ritam-m-code/Maze-Solver",
+      demoUrl: "#",
+    },
+  ];
+
   const sections = [
     {
       eyebrow: "Research",
@@ -428,7 +482,9 @@ function MainSite() {
         <div className="hero-mini-grid">
           <div className="hero-intro-stack">
             <article className="hero-mini-card hero-intro-card">
-              <h1>Hi, I&apos;m Ritam.</h1>
+              <h1>
+                Hi, I&apos;m <span className="name-highlight">Ritam</span>.
+              </h1>
               <p>
                 Mechatronics student building reliable robotics and software systems with a focus on
                 real-world performance.
@@ -480,7 +536,19 @@ function MainSite() {
                 <p className="about-place">Waterloo, ON</p>
                 <p className="about-time">{localTime}</p>
                 <p className="status-row">
-                  <span>Last pushed</span>
+                  <span className="status-label">
+                    <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+                      <path
+                        d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77 5.44 5.44 0 0 0 3.5 8.52c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                    Last pushed
+                  </span>
                   <strong>{lastPushed}</strong>
                 </p>
               </div>
@@ -648,6 +716,33 @@ function MainSite() {
                   </svg>
                 </a>
               </div>
+              <a className="resume-link" href="/WebsiteResume.pdf" download>
+                <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+                  <path
+                    d="M12 4v10"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.7"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    d="M8.8 11.8 12 15l3.2-3.2"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.7"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M5 18h14"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.7"
+                    strokeLinecap="round"
+                  />
+                </svg>
+                Download Resume
+              </a>
             </article>
           </div>
         </div>
@@ -710,6 +805,120 @@ function MainSite() {
         </div>
       </section>
 
+      <section className="vertical-columns" id="journey">
+        <article className="vertical-column">
+          <h3 className="column-heading">EXPERIENCE</h3>
+          <div className="vertical-marquee">
+            <div className="vertical-track">
+              {[0, 1].map((cloneIndex) => (
+                <div
+                  className="vertical-stack"
+                  key={`experience-clone-${cloneIndex}`}
+                  aria-hidden={cloneIndex === 1}
+                >
+                  {experienceCards.map((item) => (
+                    <article className="vertical-card experience-card" key={`${cloneIndex}-${item.company}`}>
+                      <div className="experience-top">
+                        <span className="company-logo-placeholder" aria-hidden="true" />
+                        <div className="experience-meta">
+                          <h4>{item.company}</h4>
+                          <p>{item.role}</p>
+                        </div>
+                      </div>
+                      <p className="vertical-dates">{item.dates}</p>
+                      <p className="vertical-description">{item.description}</p>
+                    </article>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        </article>
+
+        <article className="vertical-column">
+          <h3 className="column-heading">PROJECTS</h3>
+          <div className="vertical-marquee">
+            <div className="vertical-track">
+              {[0, 1].map((cloneIndex) => (
+                <div
+                  className="vertical-stack"
+                  key={`projects-clone-${cloneIndex}`}
+                  aria-hidden={cloneIndex === 1}
+                >
+                  {projectCards.map((item) => (
+                    <article className="vertical-card project-card" key={`${cloneIndex}-${item.name}`}>
+                      <h4>{item.name}</h4>
+                      <p className="vertical-dates">{item.dates}</p>
+                      <p className="vertical-description">{item.description}</p>
+                      <div className="project-tags">
+                        {item.tags.map((tag) => (
+                          <span key={tag} className="project-tag">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="project-links">
+                        <a
+                          className="project-link"
+                          href={item.githubUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          aria-label={`View ${item.name} on GitHub`}
+                        >
+                          <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+                            <path
+                              d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77 5.44 5.44 0 0 0 3.5 8.52c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="1.65"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </a>
+                        <a
+                          className="project-link"
+                          href={item.demoUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          aria-label={`Open ${item.name} demo`}
+                        >
+                          <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+                            <path
+                              d="M14 5h5v5"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="1.7"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M10 14 19 5"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="1.7"
+                              strokeLinecap="round"
+                            />
+                            <path
+                              d="M19 14v4a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 5 18V6.5A1.5 1.5 0 0 1 6.5 5h4"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="1.7"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </a>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        </article>
+      </section>
+
       <section className="section-grid minimal" id="highlights">
         {sections.map((section) => (
           <PanelCard key={section.title} {...section} />
@@ -733,6 +942,8 @@ export default function Home() {
   const [isFading, setIsFading] = useState(false);
   const fadeTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isHovering, setIsHovering] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const trailerRef = useRef<HTMLDivElement | null>(null);
   const stars = useMemo(() => {
     const count = 70;
     return Array.from({ length: count }, (_, index) => {
@@ -776,8 +987,90 @@ export default function Home() {
     };
   }, []);
 
+  useEffect(() => {
+    const updateProgress = () => {
+      const scrollTop = window.scrollY;
+      const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      setScrollProgress(Math.min(1, scrollTop / maxScroll));
+    };
+
+    updateProgress();
+    window.addEventListener("scroll", updateProgress, { passive: true });
+    window.addEventListener("resize", updateProgress);
+
+    return () => {
+      window.removeEventListener("scroll", updateProgress);
+      window.removeEventListener("resize", updateProgress);
+    };
+  }, []);
+
+  useEffect(() => {
+    const trailer = trailerRef.current;
+    if (!trailer) {
+      return;
+    }
+
+    const target = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    const current = { ...target };
+    let rafId = 0;
+    let lastMove = 0;
+
+    const onMove = (event: MouseEvent) => {
+      target.x = event.clientX;
+      target.y = event.clientY;
+      lastMove = performance.now();
+      trailer.style.opacity = "0.35";
+    };
+
+    const animate = () => {
+      current.x += (target.x - current.x) * 0.16;
+      current.y += (target.y - current.y) * 0.16;
+      trailer.style.transform = `translate3d(${current.x}px, ${current.y}px, 0)`;
+
+      if (performance.now() - lastMove > 240) {
+        trailer.style.opacity = "0";
+      }
+
+      rafId = requestAnimationFrame(animate);
+    };
+
+    window.addEventListener("mousemove", onMove, { passive: true });
+    rafId = requestAnimationFrame(animate);
+
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      cancelAnimationFrame(rafId);
+    };
+  }, []);
+
   return (
     <div className={`app-frame ${hasEntered ? "entered" : "locked"}`}>
+      <div
+        className="scroll-progress"
+        aria-hidden="true"
+        style={{ transform: `scaleX(${scrollProgress})` }}
+      />
+      <div className="cursor-trailer" ref={trailerRef} aria-hidden="true" />
+      <svg className="grain-overlay" aria-hidden="true">
+        <filter id="grain-noise-filter">
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="1.15"
+            numOctaves={2}
+            stitchTiles="stitch"
+          >
+            <animate
+              attributeName="baseFrequency"
+              dur="5.5s"
+              values="1.15;1.25;1.15"
+              repeatCount="indefinite"
+            />
+          </feTurbulence>
+          <feColorMatrix type="saturate" values="0" />
+        </filter>
+        <rect width="100%" height="100%" filter="url(#grain-noise-filter)" opacity="0.22" />
+      </svg>
+
       <div className="site-layer" aria-hidden={false}>
         <MainSite />
       </div>
