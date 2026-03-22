@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { CSSProperties, useEffect, useRef, useState } from "react";
 
 type PanelCardProps = {
   eyebrow: string;
@@ -11,150 +11,85 @@ type PanelCardProps = {
 function PanelCard({ eyebrow, title, lines }: PanelCardProps) {
   return (
     <article className="panel-card">
-      <p className="eyebrow">{eyebrow}</p>
+      <p className="eyebrow" data-tone={eyebrow}>
+        {eyebrow}
+      </p>
       <h3>{title}</h3>
       <div className="placeholder-lines">
-        {lines.map((line) => (
-          <span key={line}>{line}</span>
+        {lines.map((line, index) => (
+          <span key={line} className={`tone-${index % 3}`}>
+            {line}
+          </span>
         ))}
       </div>
     </article>
   );
 }
 
-function RobotIntro({ onPowerOn }: { onPowerOn: () => void }) {
-  return (
-    <section className="intro-screen" aria-label="Landing page lab activation screen">
-      <div className="intro-copy">
-        <p className="eyebrow">System Offline</p>
-        <h1>
-          Enter the
-          <br />
-          lab.
-        </h1>
-        <p className="intro-text">
-          A dormant research lab waits in standby. Bring power back online to wake the
-          space and enter the portfolio.
-        </p>
-      </div>
-
-      <div className="lab-stage">
-        <div className="lab-scene" aria-hidden="true">
-          <div className="lab-back-wall" />
-          <div className="lab-light light-left" />
-          <div className="lab-light light-right" />
-          <div className="lab-monitor monitor-left">
-            <span />
-          </div>
-          <div className="lab-monitor monitor-right">
-            <span />
-          </div>
-          <div className="lab-desk">
-            <div className="desk-surface" />
-            <div className="power-console">
-              <div className="console-screen" />
-              <button
-                type="button"
-                className="power-button"
-                onClick={onPowerOn}
-                aria-label="Power on portfolio"
-              >
-                <span className="power-ring" />
-              </button>
-            </div>
-          </div>
-          <div className="lab-floor-line" />
-          <div className="status-pod pod-left" />
-          <div className="status-pod pod-right" />
-          <div className="cable cable-left" />
-          <div className="cable cable-right" />
-          <div className="lab-label">
-            <span>[ ACTIVATE ]</span>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function MainSite() {
   const sections = [
     {
-      eyebrow: "Identity",
-      title: "[ Name / Tagline ]",
-      lines: ["Primary headline", "Short intro", "Call to action"],
+      eyebrow: "Research",
+      title: "Non-planar tooling",
+      lines: [
+        "Generative fabrication pipelines for 7-axis additive systems",
+        "MATLAB + ROS tooling that bridges CAD and motion planning",
+        "Focus on repeatable precision under real constraints",
+      ],
     },
     {
-      eyebrow: "Profile",
-      title: "[ About ]",
-      lines: ["Personal statement", "Interests", "What you build"],
+      eyebrow: "Software",
+      title: "Systems & Vision",
+      lines: [
+        "Transformers + PyTorch for manufacturing predictions",
+        "Realtime OpenCV monitoring for motion-sensitive hardware",
+        "Composable tooling for ML + controls experimentation",
+      ],
     },
     {
-      eyebrow: "Selected Work",
-      title: "[ Projects ]",
-      lines: ["Project one", "Project two", "Project three"],
-    },
-    {
-      eyebrow: "Field Log",
-      title: "[ Experience ]",
-      lines: ["Role", "Organization", "Impact"],
-    },
-    {
-      eyebrow: "Capabilities",
-      title: "[ Skills ]",
-      lines: ["Languages", "Tools", "Concepts"],
-    },
-    {
-      eyebrow: "Open Channel",
-      title: "[ Contact ]",
-      lines: ["Email", "LinkedIn", "GitHub"],
+      eyebrow: "Projects",
+      title: "Embedded & Mechanical",
+      lines: [
+        "Recursive motion planning for maze visualization",
+        "SolidWorks-driven solutions for the Biotron exoskeleton",
+        "Leadership for KW Sandbox workshops and robotics builds",
+      ],
     },
   ];
 
   return (
-    <main className="site-shell">
-      <header className="hero-panel">
-        <div className="mesh-layer" aria-hidden="true" />
-        <div className="hero-copy">
-          <p className="eyebrow">Neural Mesh Online</p>
-          <h1>[ Your Statement Piece Lives Here ]</h1>
+    <main className="site-shell minimal">
+      <header className="hero-panel minimal">
+        <div className="hero-copy minimal">
+          <p className="eyebrow subtle">Mechatronics Engineering @ UWaterloo</p>
+          <h1>Ritam Mukherjee</h1>
           <p>
-            Blank content blocks are ready. We can shape the copy, projects, and story
-            over time without having to rebuild the visual system.
+            Systems, robotics, and research tools built with precise hardware + thoughtful
+            software. Clean interfaces and disciplined experimentation keep the work moving.
           </p>
-        </div>
-
-        <div className="hero-orbital">
-          <div className="orbital-ring orbital-ring-a" />
-          <div className="orbital-ring orbital-ring-b" />
-          <div className="signal-core">
-            <span />
+          <div className="hero-actions minimal">
+            <a className="primary-cta" href="#highlights">
+              Explore work
+            </a>
+            <a className="secondary-cta" href="#contact">
+              Contact
+            </a>
           </div>
         </div>
       </header>
 
-      <section className="section-grid">
+      <section className="section-grid minimal" id="highlights">
         {sections.map((section) => (
           <PanelCard key={section.title} {...section} />
         ))}
       </section>
 
-      <section className="wide-panel">
-        <p className="eyebrow">Interface Notes</p>
-        <div className="wide-panel-grid">
-          <div>
-            <h2>[ Featured Module ]</h2>
-            <div className="placeholder-lines">
-              <span>Space for a featured project, visual reel, or research focus</span>
-              <span>Space for metrics, links, or interactive demos</span>
-            </div>
-          </div>
-          <div className="terminal-card">
-            <span>status:// connected</span>
-            <span>theme:// cyber mesh</span>
-            <span>content:// pending input</span>
-            <span>signal:// stable</span>
-          </div>
+      <section className="wide-panel minimal" id="contact">
+        <h2>Contact & Threads</h2>
+        <div className="placeholder-lines">
+          <span>Email: mukherjee.ritam@outlook.com</span>
+          <span>GitHub: github.com/ritam-m-code</span>
+          <span>LinkedIn: linkedin.com/in/ritammukherjee-uw</span>
         </div>
       </section>
     </main>
@@ -162,28 +97,78 @@ function MainSite() {
 }
 
 export default function Home() {
-  const [isPoweredOn, setIsPoweredOn] = useState(false);
-  const [showMainSite, setShowMainSite] = useState(false);
+  const [hasEntered, setHasEntered] = useState(false);
+  const [isFading, setIsFading] = useState(false);
+  const fadeTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [isHovering, setIsHovering] = useState(false);
 
-  useEffect(() => {
-    if (!isPoweredOn) {
+  const startReveal = () => {
+    if (hasEntered || isFading) {
       return;
     }
 
-    const timer = window.setTimeout(() => {
-      setShowMainSite(true);
-    }, 900);
+    setIsFading(true);
+    fadeTimeout.current = setTimeout(() => {
+      setHasEntered(true);
+      setIsFading(false);
+    }, 600);
+  };
 
-    return () => window.clearTimeout(timer);
-  }, [isPoweredOn]);
+  useEffect(() => {
+    return () => {
+      if (fadeTimeout.current) {
+        clearTimeout(fadeTimeout.current);
+      }
+    };
+  }, []);
 
   return (
-    <div className={`app-frame ${isPoweredOn ? "powered-on" : ""}`}>
-      {!showMainSite ? (
-        <RobotIntro onPowerOn={() => setIsPoweredOn(true)} />
-      ) : (
+    <div className={`app-frame ${hasEntered ? "entered" : "locked"}`}>
+      <div className="site-layer" aria-hidden={false}>
         <MainSite />
+      </div>
+
+      {!hasEntered && (
+        <div className={`entry-overlay${isFading ? " fading" : ""}`} role="presentation">
+          <div className="entry-backdrop" />
+          <svg
+            className="line-art"
+            viewBox="0 0 640 320"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+          >
+            <path d="M0 260 L640 60" />
+            <path d="M0 220 L640 20" />
+            <path d="M40 0 L520 320" />
+            <path d="M100 0 L600 280" />
+            <path d="M240 0 L640 200" />
+          </svg>
+          <button
+            type="button"
+            className="name-trigger"
+            onClick={startReveal}
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
+          >
+            <div className="intro-card">
+              <p className="entry-name">Ritam Mukherjee</p>
+              <div className="logo-row">
+                <img className="uw-logo" src="/uw_logo.png" alt="University of Waterloo logo" />
+                <span className="hero-tagline">Mechatronics @UWaterloo</span>
+              </div>
+              <p className="class-year">Class of 2030</p>
+              <span className="entry-helper" data-ready={isHovering ? "ready" : ""}>
+                [ enter ]
+                <span className="entry-ready">{isHovering ? " ready?" : ""}</span>
+              </span>
+            </div>
+          </button>
+        </div>
       )}
+
+      <div className={`scroll-hint ${hasEntered ? "visible" : ""}`}>
+        <span>scroll to explore ↓</span>
+      </div>
     </div>
   );
 }
