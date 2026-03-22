@@ -1,12 +1,7 @@
 "use client";
 
 import { CSSProperties, useEffect, useMemo, useRef, useState } from "react";
-
-type PanelCardProps = {
-  eyebrow: string;
-  title: string;
-  lines: string[];
-};
+import { createClient } from "@supabase/supabase-js";
 
 type TechItem = {
   name: string;
@@ -14,35 +9,22 @@ type TechItem = {
   iconText?: string;
 };
 
-function PanelCard({ eyebrow, title, lines }: PanelCardProps) {
-  return (
-    <article className="panel-card">
-      <p className="eyebrow" data-tone={eyebrow}>
-        {eyebrow}
-      </p>
-      <h3>{title}</h3>
-      <div className="placeholder-lines">
-        {lines.map((line, index) => (
-          <span key={line} className={`tone-${index % 3}`}>
-            {line}
-          </span>
-        ))}
-      </div>
-    </article>
-  );
-}
-
 function MainSite() {
   const defaultSpotifyHeading = "Last listened to";
   const defaultDiscordHeading = "Last played";
+  const lastSpotifyTrackStorageKey = "lastSpotifyTrack";
   const lastDiscordGameStorageKey = "lastDiscordGame";
   const [spotifyStatus, setSpotifyStatus] = useState("Connect Spotify to show your last listened track.");
   const [spotifyHeading, setSpotifyHeading] = useState(defaultSpotifyHeading);
   const [discordStatus, setDiscordStatus] = useState("Connect Discord presence to show your last played game.");
   const [discordHeading, setDiscordHeading] = useState(defaultDiscordHeading);
+  const lastSpotifyTrackRef = useRef<{ track: string; artist: string } | null>(null);
   const lastGameRef = useRef<{ name: string; seenAt: string } | null>(null);
   const [localTime, setLocalTime] = useState("");
   const [lastPushed, setLastPushed] = useState("Loading latest push...");
+  const [messageText, setMessageText] = useState("");
+  const [messageStatus, setMessageStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const messageStatusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const formatTimeAgo = (isoDate: string) => {
     const now = Date.now();
@@ -70,6 +52,16 @@ function MainSite() {
 
   useEffect(() => {
     try {
+      const savedSpotify = window.localStorage.getItem(lastSpotifyTrackStorageKey);
+      if (savedSpotify) {
+        const parsedSpotify = JSON.parse(savedSpotify) as { track?: string; artist?: string };
+        if (parsedSpotify.track && parsedSpotify.artist) {
+          lastSpotifyTrackRef.current = { track: parsedSpotify.track, artist: parsedSpotify.artist };
+          setSpotifyHeading(defaultSpotifyHeading);
+          setSpotifyStatus(`${parsedSpotify.track} - ${parsedSpotify.artist}`);
+        }
+      }
+
       const saved = window.localStorage.getItem(lastDiscordGameStorageKey);
       if (!saved) {
         return;
@@ -93,33 +85,69 @@ function MainSite() {
       try {
         const spotifyRes = await fetch("/api/spotify/recent", { cache: "no-store" });
 
-        if (spotifyRes.ok) {
-          const spotifyData = (await spotifyRes.json()) as {
-            track?: string;
-            artist?: string;
-            playedAt?: string;
-            isPlaying?: boolean;
-            fallback?: string;
-          };
-          if (!isActive) {
+        const spotifyData = (await spotifyRes.json()) as {
+          track?: string;
+          artist?: string;
+          playedAt?: string;
+          isPlaying?: boolean;
+          fallback?: string;
+        };
+
+        if (!isActive) {
+          return;
+        }
+
+        if (!spotifyRes.ok) {
+          if (lastSpotifyTrackRef.current) {
+            setSpotifyHeading(defaultSpotifyHeading);
+            setSpotifyStatus(
+              `${lastSpotifyTrackRef.current.track} - ${lastSpotifyTrackRef.current.artist}`,
+            );
+            return;
+          }
+          setSpotifyHeading(defaultSpotifyHeading);
+          setSpotifyStatus(spotifyData.fallback ?? "Spotify endpoint unavailable.");
+          return;
+        }
+
+        if (spotifyData.track && spotifyData.artist) {
+          lastSpotifyTrackRef.current = { track: spotifyData.track, artist: spotifyData.artist };
+          window.localStorage.setItem(
+            lastSpotifyTrackStorageKey,
+            JSON.stringify(lastSpotifyTrackRef.current),
+          );
+          if (spotifyData.isPlaying) {
+            setSpotifyHeading("Currently listening to");
+            setSpotifyStatus(`${spotifyData.track} - ${spotifyData.artist}`);
+          } else {
+            setSpotifyHeading(defaultSpotifyHeading);
+            setSpotifyStatus(`${spotifyData.track} - ${spotifyData.artist}`);
+          }
+        } else if (spotifyData.fallback) {
+          const isTemporaryGap =
+            spotifyData.fallback === "No recent Spotify track found." ||
+            spotifyData.fallback === "Spotify sync unavailable.";
+
+          if (isTemporaryGap && lastSpotifyTrackRef.current) {
+            setSpotifyHeading(defaultSpotifyHeading);
+            setSpotifyStatus(
+              `${lastSpotifyTrackRef.current.track} - ${lastSpotifyTrackRef.current.artist}`,
+            );
             return;
           }
 
-          if (spotifyData.track && spotifyData.artist) {
-            if (spotifyData.isPlaying) {
-              setSpotifyHeading("Currently listening to");
-              setSpotifyStatus(`${spotifyData.track} - ${spotifyData.artist}`);
-            } else {
-              setSpotifyHeading(defaultSpotifyHeading);
-              setSpotifyStatus(`${spotifyData.track} - ${spotifyData.artist}`);
-            }
-          } else if (spotifyData.fallback) {
-            setSpotifyHeading(defaultSpotifyHeading);
-            setSpotifyStatus(spotifyData.fallback);
-          }
+          setSpotifyHeading(defaultSpotifyHeading);
+          setSpotifyStatus(spotifyData.fallback);
         }
       } catch {
         if (isActive) {
+          if (lastSpotifyTrackRef.current) {
+            setSpotifyHeading(defaultSpotifyHeading);
+            setSpotifyStatus(
+              `${lastSpotifyTrackRef.current.track} - ${lastSpotifyTrackRef.current.artist}`,
+            );
+            return;
+          }
           setSpotifyHeading(defaultSpotifyHeading);
           setSpotifyStatus("Spotify sync unavailable right now.");
         }
@@ -394,46 +422,101 @@ function MainSite() {
 
   const experienceCards = [
     {
-      company: "Aether Robotics",
-      role: "Controls Intern",
-      dates: "May 2026 - Aug 2026",
+      company: "University of Waterloo",
+      role: "Undergrad Research Assistant",
+      dates: "Sep 2025 - Present",
       description:
-        "Built calibration tooling for multi-axis test rigs and improved repeatability in motion validation workflows.",
+        "Developing a 7-axis 3D printer using a Kinova Link6 arm under Dr. Shirley Tang. Working on non-planar slicing and G-code conversion.",
+      logo: "/uw_logo.png",
     },
     {
-      company: "Nova Manufacturing Lab",
-      role: "Research Assistant",
-      dates: "Jan 2026 - Apr 2026",
+      company: "Biotron Design Team",
+      role: "Mechanical Team Member",
+      dates: "Oct 2025 - Present",
       description:
-        "Developed data pipelines for CNC sensor streams and supported model evaluation for tool-life prediction.",
+        "Designing hip and joint components for a lower body exoskeleton competing at ACE 2026. SolidWorks-driven mechanical design under weight, cost, and material constraints.",
+      logo: "/biotronicon.png",
     },
     {
-      company: "Arc Systems",
-      role: "Embedded Developer",
-      dates: "Sep 2025 - Dec 2025",
+      company: "University of Waterloo",
+      role: "Volunteer Student Researcher",
+      dates: "July 2024 - June 2025",
       description:
-        "Implemented microcontroller diagnostics and lightweight telemetry dashboards for hardware bring-up sessions.",
+        "Built multi-modal sensor pipelines and trained Transformer models for CNC tool wear prediction under Dr. Eugene Li.",
+      logo: "/uw_logo.png",
+    },
+    {
+      company: "KW Sandbox",
+      role: "President",
+      dates: "July 2023 - June 2025",
+      description:
+        "Led a team of 12 to organize and host free STEM workshops for 160+ students, covering AI, biotech, web design, and Blender. Managed venues, sponsors, and guest speakers.",
+      logo: "/sandboxlpu.png",
+    },
+    {
+      company: "2702 Rebels",
+      role: "Team Member",
+      dates: "Sep 2023 - Oct 2024",
+      description:
+        "Prototyped and built competition robots for FIRST Robotics, leading mechanical design of the disk launching mechanism in SolidWorks and Fusion360. Also developed the computer vision module using OpenCV and TensorFlow.",
+      logo: "/rebels.png",
     },
   ];
 
   const projectCards = [
     {
-      name: "Adaptive Door Monitor",
+      name: "Axiom",
+      dates: "2026",
+      description:
+        "AI-powered platform that standardizes Canadian school performance data. Upload a test to get an AI difficulty rating, explore schools on an interactive 3D map, and calculate adjusted GPAs using school-aware adjustment factors.",
+      tags: ["TypeScript", "Next.js", "Vercel", "Supabase", "Mapbox", "Backboard"],
+      githubUrl: "https://github.com/forkiron/axiom",
+      demoUrl: "https://www.youtube.com/watch?v=xn80GkpEyw0",
+    },
+    {
+      name: "Personal Website",
+      dates: "2026",
+      description:
+        "The site you're looking at. Features live Spotify and Discord activity, GitHub integration, Supabase messaging, and a handful of hidden features.",
+      tags: ["NEXT.JS", "REACT", "TYPESCRIPT", "SUPABASE", "VERCEL"],
+      githubUrl: "https://github.com/ritam-m-code/Personal_Website",
+      demoUrl: "http://localhost:3000",
+    },
+    {
+      name: "Neural Network Chess Engine",
       dates: "2025",
       description:
-        "Edge vision pipeline for motion-triggered capture, alerting, and remote streaming on Raspberry Pi.",
-      tags: ["OpenCV", "Docker", "FastAPI"],
+        "6-layer neural network trained on millions of Grandmaster games using a custom 12-channel (12x8x8) board encoding. Deployed live to Lichess with minimax + alpha-beta pruning.",
+      tags: ["CUDA", "PyTorch", "Deep Learning", "Python", "Modal"],
+      githubUrl: "https://github.com/j3rry1iu/ChessHacks-Training",
+      demoUrl: "https://lichess.org/@/BrickAndMortar",
+    },
+    {
+      name: "Vex Garbage Collection Robot",
+      dates: "2025",
+      description:
+        "C++ control system for an autonomous VEX IQ robot that picks up and sorts objects into a bin. Built for MTE 100 at Waterloo.",
+      tags: ["C++", "Vex IQ"],
+      githubUrl: "https://github.com/j3rry1iu/Vex_Robot",
+      demoUrl:
+        "https://photos.google.com/share/AF1QipNAx9Uz6TKsmoAFf07tQSQwgIwYr2uWeFXm_2fkar0O9XJOzAttDp4i6vL57J6G7w?key=ZUpIaTBfdkJ3ZWszYjlQLWlOVzJEcGhxMGtuV3ZR",
+    },
+    {
+      name: "Adaptive Door Monitor",
+      dates: "2025",
+      description: "IoT security camera with live streaming, snapshot capture, and two-way audio.",
+      tags: ["OpenCV", "Docker", "FastAPI", "Raspberry Pi", "Python"],
       githubUrl: "https://github.com/ryanli222/smartdoorbell",
-      demoUrl: "#",
+      demoUrl: null,
     },
     {
       name: "RUL Transformer Predictor",
       dates: "2025",
       description:
-        "Time-series model for CNC tool wear forecasting with reproducible training and visualization tooling.",
+        "Transformer model trained on custom-collected CNC milling data to predict tool wear and remaining bit life. Built full data pipeline, training loop, and visualization tooling from scratch.",
       tags: ["PyTorch", "NumPy", "Python"],
       githubUrl: "https://github.com/ritam-m-code/RUL-Transfomer",
-      demoUrl: "#",
+      demoUrl: null,
     },
     {
       name: "Recursive Maze Solver",
@@ -442,39 +525,110 @@ function MainSite() {
         "Interactive visualizer with recursive generation plus DFS, BFS, and Dijkstra pathfinding comparisons.",
       tags: ["Processing", "Algorithms", "Visualization"],
       githubUrl: "https://github.com/ritam-m-code/Maze-Solver",
-      demoUrl: "#",
+      demoUrl: null,
+    },
+    {
+      name: "TuneTap",
+      dates: "2024",
+      description:
+        "Interactive virtual piano built in Processing. Play via keyboard with real-time audio, save songs to your computer, and manage recordings with real-time playback and deletion.",
+      tags: ["Processing", "Minim", "GUI Design"],
+      githubUrl: "https://github.com/Coconut-ch1ken/ICS4UI-Virtual-Piano",
+      demoUrl: null,
     },
   ];
 
-  const sections = [
+  const universityTimeline = [
     {
-      eyebrow: "Research",
-      title: "Non-planar tooling",
-      lines: [
-        "Generative fabrication pipelines for 7-axis additive systems",
-        "MATLAB + ROS tooling that bridges CAD and motion planning",
-        "Focus on repeatable precision under real constraints",
-      ],
+      dates: "Sep 2021 - Jun 2025",
+      title: "High School",
+      termType: "School",
+      status: "Completed",
+      highlights: ["Running KW Sandbox", "Volunteer research work"],
+      tone: "completed",
+      image: "/highschool.jpeg",
     },
     {
-      eyebrow: "Software",
-      title: "Systems & Vision",
-      lines: [
-        "Transformers + PyTorch for manufacturing predictions",
-        "Realtime OpenCV monitoring for motion-sensitive hardware",
-        "Composable tooling for ML + controls experimentation",
-      ],
+      dates: "Sep 2025 - Dec 2025",
+      title: "1A Mechatronics",
+      termType: "Study Term",
+      status: "Completed",
+      highlights: ["First semester of university", "VEX robot final project"],
+      tone: "completed",
+      image: "/1A_image.jpeg",
     },
     {
-      eyebrow: "Projects",
-      title: "Embedded & Mechanical",
-      lines: [
-        "Recursive motion planning for maze visualization",
-        "SolidWorks-driven solutions for the Biotron exoskeleton",
-        "Leadership for KW Sandbox workshops and robotics builds",
-      ],
+      dates: "Jan 2026 - Apr 2026",
+      title: "1B Mechatronics",
+      termType: "Study Term",
+      status: "Current",
+      highlights: ["URA work", "co-op search"],
+      tone: "current",
+      image: "/1B_image.jpg",
     },
-  ];
+    {
+      dates: "May 2026 - Aug 2026",
+      title: "Co-op Term 1",
+      termType: "Co-op Term",
+      status: "Upcoming",
+      highlights: [],
+      tone: "upcoming",
+      image: null,
+    },
+  ] as const;
+
+  const supabase = useMemo(() => {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!url || !key) {
+      return null;
+    }
+
+    return createClient(url, key);
+  }, []);
+
+  const handleMessageSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const trimmedMessage = messageText.trim();
+    setMessageText("");
+
+    if (!trimmedMessage || !supabase) {
+      setMessageStatus("error");
+      return;
+    }
+
+    setMessageStatus("sending");
+
+    const { error } = await supabase.from("messages").insert({
+      messages: trimmedMessage,
+      created_at: new Date().toISOString(),
+    });
+
+    if (error) {
+      setMessageStatus("error");
+      return;
+    }
+
+    setMessageText("");
+    setMessageStatus("sent");
+
+    if (messageStatusTimerRef.current) {
+      clearTimeout(messageStatusTimerRef.current);
+    }
+
+    messageStatusTimerRef.current = setTimeout(() => {
+      setMessageStatus("idle");
+    }, 2400);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (messageStatusTimerRef.current) {
+        clearTimeout(messageStatusTimerRef.current);
+      }
+    };
+  }, []);
 
   return (
     <main className="site-shell minimal">
@@ -486,8 +640,8 @@ function MainSite() {
                 Hi, I&apos;m <span className="name-highlight">Ritam</span>.
               </h1>
               <p>
-                Mechatronics student building reliable robotics and software systems with a focus on
-                real-world performance.
+                I build things that work. Be it hardware or software, I&apos;m happiest when I&apos;m
+                learning through experience.
               </p>
             </article>
 
@@ -528,8 +682,8 @@ function MainSite() {
           <article className="hero-mini-card hero-about-card">
             <h2>What I&apos;ve been up to</h2>
             <p>
-              I like building mechatronic systems where software, control, and hardware all need
-              to work reliably together.
+              Enjoying the last few weeks of the semester before finals, planning a trip and
+              starting the studying early.
             </p>
             <div className="about-meta-row">
               <div className="about-location">
@@ -616,8 +770,8 @@ function MainSite() {
             <article className="hero-mini-card hero-compact-card">
               <h2>I&apos;m currently working on...</h2>
               <p>
-                motion planning tooling for advanced manufacturing and practical ML workflows for
-                smarter hardware decisions.
+                Finding a job 😭, a non-planar 3D printing research project under Dr. Tang, and
+                a side project TBA.
               </p>
             </article>
 
@@ -810,27 +964,25 @@ function MainSite() {
           <h3 className="column-heading">EXPERIENCE</h3>
           <div className="vertical-marquee">
             <div className="vertical-track">
-              {[0, 1].map((cloneIndex) => (
-                <div
-                  className="vertical-stack"
-                  key={`experience-clone-${cloneIndex}`}
-                  aria-hidden={cloneIndex === 1}
-                >
-                  {experienceCards.map((item) => (
-                    <article className="vertical-card experience-card" key={`${cloneIndex}-${item.company}`}>
-                      <div className="experience-top">
+              <div className="vertical-stack">
+                {experienceCards.map((item) => (
+                  <article className="vertical-card experience-card" key={`${item.company}-${item.role}-${item.dates}`}>
+                    <div className="experience-top">
+                      {item.logo ? (
+                        <img className="company-logo-image" src={item.logo} alt={`${item.company} logo`} />
+                      ) : (
                         <span className="company-logo-placeholder" aria-hidden="true" />
-                        <div className="experience-meta">
-                          <h4>{item.company}</h4>
-                          <p>{item.role}</p>
-                        </div>
+                      )}
+                      <div className="experience-meta">
+                        <h4>{item.company}</h4>
+                        <p>{item.role}</p>
                       </div>
-                      <p className="vertical-dates">{item.dates}</p>
-                      <p className="vertical-description">{item.description}</p>
-                    </article>
-                  ))}
-                </div>
-              ))}
+                    </div>
+                    <p className="vertical-dates">{item.dates}</p>
+                    <p className="vertical-description">{item.description}</p>
+                  </article>
+                ))}
+              </div>
             </div>
           </div>
         </article>
@@ -839,43 +991,39 @@ function MainSite() {
           <h3 className="column-heading">PROJECTS</h3>
           <div className="vertical-marquee">
             <div className="vertical-track">
-              {[0, 1].map((cloneIndex) => (
-                <div
-                  className="vertical-stack"
-                  key={`projects-clone-${cloneIndex}`}
-                  aria-hidden={cloneIndex === 1}
-                >
-                  {projectCards.map((item) => (
-                    <article className="vertical-card project-card" key={`${cloneIndex}-${item.name}`}>
-                      <h4>{item.name}</h4>
-                      <p className="vertical-dates">{item.dates}</p>
-                      <p className="vertical-description">{item.description}</p>
-                      <div className="project-tags">
-                        {item.tags.map((tag) => (
-                          <span key={tag} className="project-tag">
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                      <div className="project-links">
-                        <a
-                          className="project-link"
-                          href={item.githubUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          aria-label={`View ${item.name} on GitHub`}
-                        >
-                          <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
-                            <path
-                              d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77 5.44 5.44 0 0 0 3.5 8.52c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="1.65"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
-                        </a>
+              <div className="vertical-stack">
+                {projectCards.map((item) => (
+                  <article className="vertical-card project-card" key={item.name}>
+                    <h4>{item.name}</h4>
+                    <p className="vertical-dates">{item.dates}</p>
+                    <p className="vertical-description">{item.description}</p>
+                    <div className="project-tags">
+                      {item.tags.map((tag) => (
+                        <span key={tag} className="project-tag">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="project-links">
+                      <a
+                        className="project-link"
+                        href={item.githubUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        aria-label={`View ${item.name} on GitHub`}
+                      >
+                        <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+                          <path
+                            d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77 5.44 5.44 0 0 0 3.5 8.52c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.65"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </a>
+                      {item.demoUrl && (
                         <a
                           className="project-link"
                           href={item.demoUrl}
@@ -909,30 +1057,162 @@ function MainSite() {
                             />
                           </svg>
                         </a>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              ))}
+                      )}
+                    </div>
+                  </article>
+                ))}
+              </div>
             </div>
           </div>
         </article>
       </section>
 
-      <section className="section-grid minimal" id="highlights">
-        {sections.map((section) => (
-          <PanelCard key={section.title} {...section} />
-        ))}
-      </section>
-
-      <section className="wide-panel minimal" id="contact">
-        <h2>Contact & Threads</h2>
-        <div className="placeholder-lines">
-          <span>Email: mukherjee.ritam@outlook.com</span>
-          <span>GitHub: github.com/ritam-m-code</span>
-          <span>LinkedIn: linkedin.com/in/ritammukherjee-uw</span>
+      <section className="timeline-section" id="university-timeline">
+        <div className="timeline-heading">
+          <h2>My Journey</h2>
+        </div>
+        <div className="timeline-scroll" aria-label="University timeline">
+          {universityTimeline.map((term, index) => (
+            <article
+              className={`timeline-card ${term.tone}${
+                index < universityTimeline.length - 1 ? " has-next" : ""
+              }`}
+              key={`${term.dates}-${term.title}`}
+            >
+              {term.image ? (
+                <div className="term-photo-placeholder term-photo-frame">
+                  <img src={term.image} alt={`${term.title} term highlight`} />
+                </div>
+              ) : (
+                <div className="term-photo-placeholder coming-soon" aria-label="Coming soon">
+                  Coming soon
+                </div>
+              )}
+              <p className="timeline-dates">{term.dates}</p>
+              <h3>{term.title}</h3>
+              <p className="timeline-meta">
+                {term.termType} | {term.status}
+              </p>
+              {term.highlights.length > 0 && (
+                <div className="timeline-highlights">
+                  <p>Highlights:</p>
+                  <ul>
+                    {term.highlights.map((highlight) => (
+                      <li key={highlight}>{highlight}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </article>
+          ))}
         </div>
       </section>
+
+      <section className="wide-panel minimal message-panel" id="message">
+        <h2>Leave me a message</h2>
+        <form className="message-form" onSubmit={handleMessageSubmit}>
+          <input
+            type="text"
+            value={messageText}
+            onChange={(event) => {
+              setMessageText(event.target.value);
+              if (messageStatus === "error") {
+                setMessageStatus("idle");
+              }
+            }}
+            placeholder="Type a message..."
+            maxLength={240}
+            aria-label="Leave a message"
+          />
+          <button type="submit" disabled={messageStatus === "sending"}>
+            {messageStatus === "sending" ? "Sending..." : "Send"}
+          </button>
+        </form>
+        {messageStatus === "sent" && <p className="message-feedback">Message sent.</p>}
+      </section>
+
+      <footer className="site-footer" aria-label="Footer">
+        <div className="contact-icons footer-links" aria-label="Footer contact links">
+          <a className="icon-link" href="mailto:mukherjee.ritam@outlook.com" aria-label="Email Ritam">
+            <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+              <path d="M4 6h16v12H4z" fill="none" stroke="currentColor" strokeWidth="1.7" />
+              <path d="M4.5 7l7.5 6 7.5-6" fill="none" stroke="currentColor" strokeWidth="1.7" />
+            </svg>
+          </a>
+          <a
+            className="icon-link"
+            href="https://github.com/ritam-m-code"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Visit GitHub profile"
+          >
+            <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+              <path
+                d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77 5.44 5.44 0 0 0 3.5 8.52c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </a>
+          <a
+            className="icon-link"
+            href="https://www.linkedin.com/in/ritammukherjee-uw"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Visit LinkedIn profile"
+          >
+            <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+              <rect
+                x="3"
+                y="3"
+                width="18"
+                height="18"
+                rx="2.5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <circle cx="8" cy="8" r="1" fill="currentColor" />
+              <path d="M7 11v6" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+              <path d="M11 17v-3.5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+              <path
+                d="M11 13.5a2.3 2.3 0 0 1 4.6 0V17"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                fill="none"
+              />
+            </svg>
+          </a>
+          <a
+            className="icon-link"
+            href="https://discord.com/users/541061375116705802"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Message on Discord (rmwat)"
+            title="rmwat on Discord"
+          >
+            <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+              <path
+                d="M7 7.5a14.8 14.8 0 0 1 3.2-1l.4.8a10.1 10.1 0 0 1 2.8 0l.4-.8a14.8 14.8 0 0 1 3.2 1A14.2 14.2 0 0 1 19 15a14.3 14.3 0 0 1-3.9 2l-.8-1.3c.6-.2 1.2-.5 1.7-.9-.4.3-.9.5-1.4.7a8.7 8.7 0 0 1-5.2 0c-.5-.2-1-.4-1.4-.7.5.4 1.1.7 1.7.9L8.9 17A14.3 14.3 0 0 1 5 15 14.2 14.2 0 0 1 7 7.5z"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.45"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <circle cx="10" cy="12" r="1.1" fill="currentColor" />
+              <circle cx="14" cy="12" r="1.1" fill="currentColor" />
+            </svg>
+          </a>
+        </div>
+        <p className="footer-note">Built by Ritam Mukherjee · 2026</p>
+      </footer>
     </main>
   );
 }
@@ -1123,3 +1403,4 @@ export default function Home() {
     </div>
   );
 }
+
