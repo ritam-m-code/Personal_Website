@@ -1111,6 +1111,10 @@ textarea {
   color: rgba(240, 181, 43, 0.92);
 }
 
+.message-feedback-error {
+  color: rgba(255, 120, 120, 0.95);
+}
+
 .site-footer {
   display: grid;
   justify-items: center;

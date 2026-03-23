@@ -24,6 +24,7 @@ function MainSite() {
   const [lastPushed, setLastPushed] = useState("Loading latest push...");
   const [messageText, setMessageText] = useState("");
   const [messageStatus, setMessageStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [messageErrorText, setMessageErrorText] = useState("");
   const messageStatusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const formatTimeAgo = (isoDate: string) => {
@@ -593,9 +594,15 @@ function MainSite() {
     event.preventDefault();
     const trimmedMessage = messageText.trim();
     setMessageText("");
+    setMessageErrorText("");
 
     if (!trimmedMessage || !supabase) {
       setMessageStatus("error");
+      setMessageErrorText(
+        !trimmedMessage
+          ? "Please type a message before sending."
+          : "Supabase client is not initialized. Restart dev server after updating .env.local.",
+      );
       return;
     }
 
@@ -608,6 +615,10 @@ function MainSite() {
 
     if (error) {
       setMessageStatus("error");
+      const details = [error.message, error.details, error.hint].filter(Boolean).join(" | ");
+      setMessageErrorText(
+        details ? `Could not send message: ${details}` : "Could not send message right now. Please try again.",
+      );
       return;
     }
 
@@ -1119,6 +1130,7 @@ function MainSite() {
               setMessageText(event.target.value);
               if (messageStatus === "error") {
                 setMessageStatus("idle");
+                setMessageErrorText("");
               }
             }}
             placeholder="Type a message..."
@@ -1130,6 +1142,9 @@ function MainSite() {
           </button>
         </form>
         {messageStatus === "sent" && <p className="message-feedback">Message sent.</p>}
+        {messageStatus === "error" && (
+          <p className="message-feedback message-feedback-error">{messageErrorText}</p>
+        )}
       </section>
 
       <footer className="site-footer" aria-label="Footer">
