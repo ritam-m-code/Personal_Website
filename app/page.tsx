@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { CSSProperties, useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
@@ -126,7 +126,8 @@ function MainSite() {
         } else if (spotifyData.fallback) {
           const isTemporaryGap =
             spotifyData.fallback === "No recent Spotify track found." ||
-            spotifyData.fallback === "Spotify sync unavailable.";
+            spotifyData.fallback === "Spotify sync unavailable." ||
+            spotifyData.fallback === "Spotify auth failed.";
 
           if (isTemporaryGap && lastSpotifyTrackRef.current) {
             setSpotifyHeading(defaultSpotifyHeading);
@@ -248,7 +249,7 @@ function MainSite() {
         }
 
         const repoName = latestPush.repo.name.split("/").pop() ?? latestPush.repo.name;
-        setLastPushed(`${repoName} · ${formatTimeAgo(latestPush.created_at)}`);
+        setLastPushed(`${repoName} - ${formatTimeAgo(latestPush.created_at)}`);
       } catch {
         setLastPushed("GitHub activity unavailable.");
       }
@@ -480,7 +481,7 @@ function MainSite() {
         "The site you're looking at. Features live Spotify and Discord activity, GitHub integration, Supabase messaging, and a handful of hidden features.",
       tags: ["NEXT.JS", "REACT", "TYPESCRIPT", "SUPABASE", "VERCEL"],
       githubUrl: "https://github.com/ritam-m-code/Personal_Website",
-      demoUrl: "http://localhost:3000",
+      demoUrl: "/",
     },
     {
       name: "Neural Network Chess Engine",
@@ -870,7 +871,7 @@ function MainSite() {
                   </svg>
                 </a>
               </div>
-              <a className="resume-link" href="/WebsiteResume.pdf" download>
+              <a className="resume-link" href="/RitamMukherjeeMay.pdf" download>
                 <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
                   <path
                     d="M12 4v10"
@@ -1211,7 +1212,7 @@ function MainSite() {
             </svg>
           </a>
         </div>
-        <p className="footer-note">Built by Ritam Mukherjee · 2026</p>
+        <p className="footer-note">Built by Ritam Mukherjee - 2026</p>
       </footer>
     </main>
   );
@@ -1403,4 +1404,5 @@ export default function Home() {
     </div>
   );
 }
+
 
