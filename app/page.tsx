@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { CSSProperties, useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
@@ -563,15 +563,24 @@ function MainSite() {
       dates: "Jan 2026 - Apr 2026",
       title: "1B Mechatronics",
       termType: "Study Term",
-      status: "Current",
+      status: "Completed",
       highlights: ["URA work", "co-op search"],
-      tone: "current",
+      tone: "completed",
       image: "/1B_image.jpg",
     },
     {
       dates: "May 2026 - Aug 2026",
       title: "Co-op Term 1",
       termType: "Co-op Term",
+      status: "Current",
+      highlights: ["SWE @ SuraNeoAge"],
+      tone: "current",
+      image: null,
+    },
+    {
+      dates: "Sep 2026 - Dec 2026",
+      title: "2A Mechatronics",
+      termType: "Study Term",
       status: "Upcoming",
       highlights: [],
       tone: "upcoming",
@@ -662,7 +671,7 @@ function MainSite() {
               <p className="status-academic">
                 <img className="status-uw-logo" src="/uw_logo.png" alt="University of Waterloo logo" />
                 <span>
-                  1B Mechatronics{" "}
+                  Co-op Term 1{" "}
                   <a href="https://uwaterloo.ca" target="_blank" rel="noreferrer">
                     @uwaterloo
                   </a>
@@ -686,7 +695,7 @@ function MainSite() {
                     strokeLinecap="round"
                   />
                 </svg>
-                Looking for Spring &apos;26 Co-op
+                SWE @SuraNeoAge
               </p>
             </article>
           </div>
@@ -694,8 +703,7 @@ function MainSite() {
           <article className="hero-mini-card hero-about-card">
             <h2>What I&apos;ve been up to</h2>
             <p>
-              Enjoying the last few weeks of the semester before finals, planning a trip and
-              starting the studying early.
+              catching up with friends, getting used to working and enjoying a break from school
             </p>
             <div className="about-meta-row">
               <div className="about-location">
@@ -782,8 +790,7 @@ function MainSite() {
             <article className="hero-mini-card hero-compact-card">
               <h2>I&apos;m currently working on...</h2>
               <p>
-                Finding a job 😭, a non-planar 3D printing research project under Dr. Tang, and
-                a side project TBA.
+                SWE @SuraNeoAge, Enjoying the summer
               </p>
             </article>
 
@@ -1086,9 +1093,8 @@ function MainSite() {
         <div className="timeline-scroll" aria-label="University timeline">
           {universityTimeline.map((term, index) => (
             <article
-              className={`timeline-card ${term.tone}${
-                index < universityTimeline.length - 1 ? " has-next" : ""
-              }`}
+              className={`timeline-card ${term.tone}${index < universityTimeline.length - 1 ? " has-next" : ""
+                }`}
               key={`${term.dates}-${term.title}`}
             >
               {term.image ? (
