@@ -889,7 +889,7 @@ function MainSite() {
                   </svg>
                 </a>
               </div>
-              <a className="resume-link" href="/RitamMukherjeeMay.pdf" download>
+              <a className="resume-link" href="/RitamMukherjeeMay.pdf" target="_blank" rel="noopener noreferrer">
                 <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
                   <path
                     d="M12 4v10"
