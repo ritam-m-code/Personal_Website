@@ -575,7 +575,7 @@ function MainSite() {
       status: "Current",
       highlights: ["SWE @ SuraNeoAge"],
       tone: "current",
-      image: null,
+      image: "/coop1.jpg",
     },
     {
       dates: "Sep 2026 - Dec 2026",
