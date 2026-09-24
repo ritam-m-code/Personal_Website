@@ -1,0 +1,23 @@
+.footer {
+  border-top: 1px solid var(--line);
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1.75rem var(--edge);
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+}
+
+.sourceLink {
+  color: var(--ink-faint);
+  text-decoration: none;
+}
+
+.sourceLink:hover {
+  color: var(--blueprint);
+}

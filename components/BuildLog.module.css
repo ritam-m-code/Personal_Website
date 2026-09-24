@@ -1,0 +1,140 @@
+.layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+}
+
+@media (min-width: 880px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr) 200px;
+  }
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 4.5rem auto;
+  gap: 0.4rem 0.9rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--line);
+  align-items: baseline;
+}
+
+.row:first-child {
+  padding-top: 0;
+}
+
+.date {
+  font-size: 0.72rem;
+  color: var(--ink-faint);
+}
+
+.repo {
+  grid-column: 2;
+  font-size: 0.82rem;
+  color: var(--blueprint);
+  text-decoration: none;
+}
+
+.repo:hover {
+  text-decoration: underline;
+}
+
+.summary {
+  grid-column: 2;
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+  line-height: 1.4;
+}
+
+@media (min-width: 560px) {
+  .row {
+    grid-template-columns: 4.5rem 8rem 1fr;
+  }
+  .repo {
+    grid-column: 2;
+  }
+  .summary {
+    grid-column: 3;
+  }
+}
+
+.skeletonRow {
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.skeletonBar {
+  display: block;
+  height: 0.9rem;
+  width: 70%;
+  background: var(--line);
+  border-radius: 2px;
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+.fallback {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+.fallbackLink {
+  color: var(--blueprint);
+}
+
+.stats {
+  border-top: 1px solid var(--line);
+  padding-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 880px) {
+  .stats {
+    border-top: none;
+    border-left: 1px solid var(--line);
+    padding-top: 0;
+    padding-left: 1.75rem;
+  }
+}
+
+.statsLabel {
+  font-size: 0.68rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.statRow {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.statValue {
+  font-size: 1.4rem;
+  color: var(--ink);
+}
+
+.statKey {
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+}
+
+.statsPlaceholder {
+  color: var(--ink-faint);
+  margin: 0;
+}
