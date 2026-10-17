@@ -23,7 +23,7 @@
   padding: 1.1rem 1.4rem;
   cursor: pointer;
   transition: border-color 0.15s ease, background 0.15s ease;
-  margin-bottom: 1.75rem;
+  margin-bottom: 0.8rem;
   text-align: left;
 }
 
@@ -36,6 +36,24 @@
   font-size: 0.72rem;
   color: var(--ink-faint);
   flex-shrink: 0;
+}
+
+.altEmail {
+  font-size: 0.78rem;
+  color: var(--ink-faint);
+  margin: 0 0 1.75rem;
+}
+
+.altEmailLink {
+  color: var(--ink-soft);
+  text-decoration: none;
+  border-bottom: 1px solid var(--line-strong);
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.altEmailLink:hover {
+  color: var(--blueprint);
+  border-color: var(--blueprint);
 }
 
 .links {

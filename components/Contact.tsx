@@ -38,6 +38,13 @@ export default function Contact() {
             <span className={`mono ${styles.copyHint}`}>{copied ? "copied ✓" : "copy"}</span>
           </button>
 
+          <p className={`mono ${styles.altEmail}`}>
+            or{" "}
+            <a href={`mailto:${profile.altEmail}`} className={styles.altEmailLink}>
+              {profile.altEmail}
+            </a>
+          </p>
+
           <div className={styles.links}>
             <a href={`mailto:${profile.email}`} className={styles.linkPill}>
               Email

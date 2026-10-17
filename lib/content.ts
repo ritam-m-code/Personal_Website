@@ -1,4 +1,4 @@
-// Single source of truth for site copy — sourced from RitamMukherjee_ResumeSeptember.pdf.
+// Single source of truth for site copy — sourced from RitamMukherjeeC2.pdf (Oct 2026).
 // Edit here; components just render this.
 
 export const profile = {
@@ -9,7 +9,8 @@ export const profile = {
     "I split my time between machine learning — fine-tuning and deploying language models in production — and robotics, building physical systems at the University of Waterloo. I like working on projects that sit at that intersection.",
   seeking: "Seeking Winter '27 Co-op",
   location: "Waterloo, Ontario",
-  email: "mukherjee.ritam@outlook.com",
+  email: "r9mukher@uwaterloo.ca",
+  altEmail: "mukherjee.ritam@outlook.com",
   phone: "226-792-4096",
   links: {
     github: "https://github.com/ritam-m-code",
@@ -19,7 +20,6 @@ export const profile = {
   education: {
     school: "University of Waterloo",
     program: "B.A.Sc. Mechatronics Engineering",
-    gpa: "3.8 / 4.0",
     expected: "Expected May 2030",
   },
 };
@@ -43,7 +43,7 @@ export const featuredWork: FeaturedWork = {
   problem:
     "An early-stage fintech startup needed to extract entities, topics, and relevance signal from 2,700+ scraped financial news articles per cycle — a task previously done by manual editorial curation, which didn't scale and couldn't be queried in real time.",
   decision:
-    "Built the ingestion-to-training pipeline (PostgreSQL, FastAPI, Docker) and fine-tuned two models for two different jobs rather than one model for everything: Phi-4 Mini (14B) via QLoRA for entity/topic extraction using GPT-4o-generated ground truth enriched with NSE sector data, and a separately fine-tuned FinBERT (110M) for company NER, where a smaller, cheaper model was the right tool. Replaced manual relevance curation with an on-demand scoring endpoint, persisting the latest verdict per article in Redis with automatic cache invalidation on reclassification — decoupling read latency from LLM inference time instead of blocking requests on the model.",
+    "Built the ingestion-to-training pipeline (PostgreSQL, FastAPI, Docker) and fine-tuned two models for two different jobs rather than one model for everything: Phi-4 Mini (3.8B) via QLoRA for entity/topic extraction using GPT-4o-generated ground truth enriched with NSE sector data, and a separately fine-tuned FinBERT (110M) for company NER, where a smaller, cheaper model was the right tool. Replaced manual relevance curation with an on-demand scoring endpoint, persisting the latest verdict per article in Redis with automatic cache invalidation on reclassification — decoupling read latency from LLM inference time instead of blocking requests on the model.",
   outcome:
     "The fine-tuned Phi-4 Mini outperformed both the base model and GPT-4o mini in a 100-article blind ABC comparison judged by the team's business analyst. FinBERT reached 0.76 token F1 / 0.88 recall on company NER. The relevance endpoint removed manual curation from the editorial workflow entirely.",
   stack: [
@@ -79,6 +79,15 @@ export const experience: ExperienceEntry[] = [
       "Building a pose-estimation and biomechanical simulation pipeline for analyzing judo throws, starting with osoto gari. Modeled body-segment inertial parameters (BSIP) from anthropometric data and a deterministic kinematic model — center of mass, ground reaction forces, 3D joint trajectories for thrower and opponent — validated against YOLOv8 pose estimation run on reference footage. Currently extending the pipeline to fuse two synchronized camera streams through YOLOv8 and a transformer model, for more robust technique reconstruction than a single viewpoint allows.",
     tags: ["YOLOv8", "Computer Vision", "Biomechanics", "Python"],
     logo: "/logos/uw.png",
+  },
+  {
+    role: "Core Member — Humanoid Perception",
+    org: "WATonomous",
+    period: "Sep 2026 — Present",
+    location: "Waterloo, Ontario",
+    description:
+      "Building real-time perception and teleoperation data pipelines in C++ and ROS 2 for long-horizon humanoid manipulation. Designing multi-modal sensory ingestion workflows that synchronize visual and joint telemetry into a single timeline, so policy demonstrations can be recorded straight off the robot instead of stitched together after the fact.",
+    tags: ["ROS 2", "C++", "Teleoperation", "Sensor Fusion"],
   },
   {
     role: "Software Engineering Intern",
@@ -218,12 +227,44 @@ export const skills: { group: string; items: string[] }[] = [
   { group: "Languages", items: ["Python", "C++", "C#", "TypeScript", "JavaScript", "SQL"] },
   {
     group: "ML / Data",
-    items: ["PyTorch", "HuggingFace", "QLoRA", "scikit-learn", "NumPy", "OpenCV", "TensorFlow"],
+    items: [
+      "PyTorch",
+      "HuggingFace",
+      "QLoRA",
+      "scikit-learn",
+      "NumPy",
+      "OpenCV",
+      "TensorFlow",
+      "Reinforcement Learning",
+    ],
   },
-  { group: "Robotics", items: ["ROS 2", "SolidWorks", "AutoCAD", "Fusion 360"] },
+  {
+    group: "Robotics / Controls",
+    items: [
+      "ROS 2",
+      "Foxglove Studio",
+      "Kinematics (FK/IK)",
+      "Trajectory Planning",
+      "State Estimation (EKF/UKF)",
+      "SolidWorks",
+      "Fusion 360",
+    ],
+  },
   {
     group: "Web / Infra",
-    items: ["FastAPI", "Next.js", "React", "PostgreSQL", "Redis", "Supabase", "Docker", "Vercel"],
+    items: [
+      "FastAPI",
+      "Next.js",
+      "React",
+      "PostgreSQL",
+      "Redis",
+      "Supabase",
+      "Docker",
+      "Vercel",
+      "Git",
+      "Bash",
+      "Linux",
+    ],
   },
 ];
 

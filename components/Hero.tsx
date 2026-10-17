@@ -31,7 +31,7 @@ export default function Hero() {
               <dd>
                 {profile.education.program}
                 <br />
-                {profile.education.expected} · {profile.education.gpa} GPA
+                {profile.education.expected}
               </dd>
             </div>
             <div className={styles.metaRow}>
